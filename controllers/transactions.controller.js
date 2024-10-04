@@ -14,7 +14,7 @@ export const createTransaction = async (req, res) => {
 // Obtener todas las transacciones
 export const getAllTransactions = async (req, res) => {
   try {
-    const transactions = await Transaction.find().populate('property buyer seller');
+    const transactions = await Transaction.find();
     res.status(200).json(transactions);
   } catch (error) {
     res.status(500).json({ message: 'Error al obtener las transacciones', error });
@@ -24,7 +24,7 @@ export const getAllTransactions = async (req, res) => {
 // Obtener una transacción por ID
 export const getTransactionById = async (req, res) => {
   try {
-    const transaction = await Transaction.findById(req.params.id).populate('property buyer seller');
+    const transaction = await Transaction.findById(req.params.id);
     if (!transaction) return res.status(404).json({ message: 'Transacción no encontrada' });
     res.status(200).json(transaction);
   } catch (error) {
