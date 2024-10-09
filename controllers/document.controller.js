@@ -4,6 +4,8 @@ import { Document } from '../models/documents.js';
 export const uploadDocument = async (req, res) => {
     try {
         const { idproperty, iduser } = req.body;
+        console.log(req.body);
+        console.log(idproperty, iduser);
 
         if (!req.file) {
             return res.status(400).json({ message: 'Por favor, suba un archivo.' });
@@ -26,7 +28,7 @@ export const uploadDocument = async (req, res) => {
 // Leer todos los documentos
 export const getAllDocuments = async (req, res) => {
     try {
-        const documents = await Document.find().populate('idproperty').populate('iduser');
+        const documents = await Document.find();
         res.status(200).json(documents);
     } catch (error) {
         res.status(500).json({ message: 'Error al obtener los documentos.', error });
@@ -36,7 +38,7 @@ export const getAllDocuments = async (req, res) => {
 // Leer un documento por ID
 export const getDocumentById = async (req, res) => {
     try {
-        const document = await Document.findById(req.params.id).populate('idproperty').populate('iduser');
+        const document = await Document.findById(req.params.id);
         if (!document) {
             return res.status(404).json({ message: 'Documento no encontrado.' });
         }
