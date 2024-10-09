@@ -12,8 +12,12 @@ const storage = multer.diskStorage({
         cb(null, path.join(__dirname, '../public/uploads/documents')); // Carpeta donde se almacenarán los archivos
     },
     filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, uniqueSuffix + path.extname(file.originalname)); // Generar un nombre único
+        const now = new Date();
+        const timeStamp = `${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}`;
+        const originalName = path.parse(file.originalname).name; // Obtener solo el nombre del archivo sin la extensión
+        const extension = path.extname(file.originalname); // Obtener la extensión del archivo
+        const uniqueName = `${originalName}-${timeStamp}${extension}`; // Generar el nombre único
+        cb(null, uniqueName);
     }
 });
 
