@@ -53,36 +53,41 @@ export const updateDocument = async (req, res) => {
     try {
         const { idproperty, iduser } = req.body;
 
-        const document = await Document.findById(req.params.id);
-        if (!document) {
+        // Preparamos el objeto de actualización con los campos que han cambiado
+        let updateFields = {
+            idproperty,
+            iduser,
+        };
+
+        // Si hay un nuevo archivo subido, también lo añadimos al objeto de actualización
+        if (req.file) {
+            updateFields.fileUrl = `/uploads/documents/${req.file.filename}`;
+            updateFields.fileType = req.file.mimetype.split('/')[1];
+        }
+
+        // Usamos findByIdAndUpdate para actualizar el documento
+        const updatedDocument = await Document.findByIdAndUpdate(
+            req.params.id,
+            { $set: updateFields }, // Establecemos los campos a actualizar
+            { new: true } // Devolvemos el documento actualizado
+        );
+
+        if (!updatedDocument) {
             return res.status(404).json({ message: 'Documento no encontrado.' });
         }
 
-        document.idproperty = idproperty || document.idproperty;
-        document.iduser = iduser || document.iduser;
-
-        // Si hay un archivo nuevo subido, actualiza la URL
-        if (req.file) {
-            document.fileUrl = `/uploads/documents/${req.file.filename}`;
-            document.fileType = req.file.mimetype.split('/')[1];
-        }
-
-        await document.save();
-        res.status(200).json({ message: 'Documento actualizado con éxito.', document });
+        res.status(200).json({ message: 'Documento actualizado con éxito.', document: updatedDocument });
     } catch (error) {
         res.status(500).json({ message: 'Error al actualizar el documento.', error });
     }
 };
 
+
 // Eliminar un documento por ID
 export const deleteDocument = async (req, res) => {
     try {
-        const document = await Document.findById(req.params.id);
-        if (!document) {
-            return res.status(404).json({ message: 'Documento no encontrado.' });
-        }
-
-        await document.remove();
+        const deletedDocument = await Document.findByIdAndDelete(req.params.id);
+        if (!deletedDocument) return res.status(404).json({ message: 'Documento no encontrada' });
         res.status(200).json({ message: 'Documento eliminado con éxito.' });
     } catch (error) {
         res.status(500).json({ message: 'Error al eliminar el documento.', error });
