@@ -7,6 +7,8 @@ import routerUser from "./routes/users.route.js";
 import routerTransaction from "./routes/transactions.route.js";
 import routerProperty from "./routes/properties.route.js";
 import routerContract from "./routes/contracts.route.js";
+import routerDocument from "./routes/document.route.js";
+
 
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -26,6 +28,7 @@ app.use("/api/v1/user", routerUser)
 app.use("/api/v1/transaction", routerTransaction);
 app.use("/api/v1/property", routerProperty);
 app.use("/api/v1/contract", routerContract);
+app.use("/api/v1/document", routerDocument);
 
 app.listen(PORT, () => {
   console.log("Running: " + PORT);
