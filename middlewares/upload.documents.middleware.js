@@ -73,7 +73,13 @@ const uploadToCloudinary = (req, res, next) => {
         { 
             folder: 'documents', // Carpeta donde se guardarán los documentos en Cloudinary
             resource_type: 'raw', // Indicar que se está subiendo un archivo en bruto
-            public_id: newFileName // Establecer el ID público con la extensión correcta
+            public_id: newFileName, // Establecer el ID público con la extensión correcta
+            access_control: [
+                {
+                    access_type: "public",
+                    permission: "read"
+                }
+            ]
         }, 
         (error, result) => {
             if (error) {
