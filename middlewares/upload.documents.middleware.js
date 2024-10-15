@@ -67,7 +67,7 @@ const uploadToCloudinary = (req, res, next) => {
 
     // Asegúrate de que el nombre del archivo tenga la extensión .pdf
     const fileName = req.file.originalname.replace(/\.[^/.]+$/, ""); // Quitar la extensión actual
-    const newFileName = `${fileName}`; // Añadir la extensión .pdf
+    const newFileName = `${fileName}.pdf`; // Añadir la extensión .pdf
 
     const stream = cloudinary.uploader.upload_stream(
         { 
