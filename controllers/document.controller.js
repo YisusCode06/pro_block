@@ -3,27 +3,25 @@ import { Document } from '../models/documents.js';
 // Crear (Subir) un documento
 export const uploadDocument = async (req, res) => {
     try {
-        const { idproperty, iduser } = req.body;
-        console.log(req.body);
-        console.log(idproperty, iduser);
+        console.log('Datos del cuerpo:', req.body); // Para depuración
+        console.log('Archivo recibido:', req.file); // Para depuración
 
-        if (!req.file) {
-            return res.status(400).json({ message: 'Por favor, suba un archivo.' });
-        }
-
-        const document = new Document({
-            idproperty,
-            iduser,
-            fileUrl: `/uploads/documents/${req.file.filename}`,
-            fileType: req.file.mimetype.split('/')[1]
+        const newDocument = new Document({
+            idproperty: req.body.idproperty,
+            iduser: req.body.iduser,
+            fileUrl: req.file.cloudinaryUrl, // Almacenar la URL del archivo en fileUrl
+            fileType: req.file.fileType.split('/')[1] // Almacenar solo la extensión del archivo
         });
 
-        await document.save();
-        res.status(201).json({ message: 'Documento subido con éxito.', document });
+        const savedDocument = await newDocument.save();
+
+        return res.status(201).json(savedDocument);
     } catch (error) {
-        res.status(500).json({ message: 'Error al subir el documento.', error });
+        console.error('Error al subir el documento:', error);
+        return res.status(500).json({ message: 'Error al subir el documento.', error });
     }
 };
+
 
 // Leer todos los documentos
 export const getAllDocuments = async (req, res) => {
@@ -49,20 +47,32 @@ export const getDocumentById = async (req, res) => {
 };
 
 // Actualizar un documento por ID
+// Actualizar un documento por ID
 export const updateDocument = async (req, res) => {
     try {
         const { idproperty, iduser } = req.body;
 
+        // Verifica que al menos uno de los campos necesarios esté presente
+        if (!idproperty && !iduser && !req.file) {
+            return res.status(400).json({ message: 'Se debe proporcionar al menos un campo para actualizar.' });
+        }
+
         // Preparamos el objeto de actualización con los campos que han cambiado
-        let updateFields = {
-            idproperty,
-            iduser,
-        };
+        let updateFields = {};
+
+        // Solo actualizamos los campos si están presentes en el cuerpo de la solicitud
+        if (idproperty) {
+            updateFields.idproperty = idproperty;
+        }
+
+        if (iduser) {
+            updateFields.iduser = iduser;
+        }
 
         // Si hay un nuevo archivo subido, también lo añadimos al objeto de actualización
         if (req.file) {
-            updateFields.fileUrl = `/uploads/documents/${req.file.filename}`;
-            updateFields.fileType = req.file.mimetype.split('/')[1];
+            updateFields.fileUrl = req.file.cloudinaryUrl; // Almacena la URL del archivo en fileUrl
+            updateFields.fileType = req.file.fileType; // Guarda el tipo de archivo si es necesario
         }
 
         // Usamos findByIdAndUpdate para actualizar el documento
@@ -78,6 +88,7 @@ export const updateDocument = async (req, res) => {
 
         res.status(200).json({ message: 'Documento actualizado con éxito.', document: updatedDocument });
     } catch (error) {
+        console.error('Error al actualizar el documento:', error); // Para depuración
         res.status(500).json({ message: 'Error al actualizar el documento.', error });
     }
 };

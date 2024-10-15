@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import { uploadDocument, getAllDocuments, getDocumentById, updateDocument, deleteDocument } from '../controllers/document.controller.js';
-import upload from '../middlewares/upload.documents.middleware.js';
+import { upload, uploadToCloudinary } from '../middlewares/upload.documents.middleware.js';
 
 const routerDocument = Router();
 
 // Crear un documento
-routerDocument.post('/', upload.single('file'), uploadDocument);
+//routerDocument.post('/', upload.single('file'), uploadDocument);
+routerDocument.post('/', upload.single('file'), uploadToCloudinary, uploadDocument);
 
 // Obtener todos los documentos
 routerDocument.get('/', getAllDocuments);
